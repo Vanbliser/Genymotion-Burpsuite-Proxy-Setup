@@ -162,15 +162,17 @@ If the above global proxy setting does not work, we can try nat forwarding:
 
 ```bash
 adb shell "iptables -t nat -F"
-adb shell "iptables -t nat -A OUTPUT -p tcp --dport 80 -j DNAT --to-destination $(ifconfig en0 | grep "inet" | grep -v "inet6" | awk '{ print $2 }' | sed 's/\/.*//g'):8080"
-adb shell "iptables -t nat -A OUTPUT -p tcp --dport 443 -j DNAT --to-destination $(ifconfig en0 | grep "inet" | grep -v "inet6" | awk '{ print $2 }' | sed 's/\/.*//g'):8080"                                                       
-adb shell "iptables -t nat -A OUTPUT -p tcp --dport 8080 -j DNAT --to-destination $(ifconfig en0 | grep "inet" | grep -v "inet6" | awk '{ print $2 }' | sed 's/\/.*//g'):8080"
+adb shell "iptables -t nat -A OUTPUT -p tcp --dport 80 -j DNAT --to-destination <IP>:1337"
+adb shell "iptables -t nat -A OUTPUT -p tcp --dport 443 -j DNAT --to-destination <IP>:8080"                                                       
+adb shell "iptables -t nat -A OUTPUT -p tcp --dport 8080 -j DNAT --to-destination <IP>:1337"
 adb shell "iptables -t nat -A POSTROUTING -p tcp --dport 443 -j MASQUERADE"
 adb shell "iptables -t nat -A POSTROUTING -p tcp --dport 80 -j MASQUERADE"
 adb shell "iptables -t nat -A POSTROUTING -p tcp --dport 8080 -j MASQUERADE"
 ```
 
 If the above still does not work, we can continue our VPN setup. Ensure to reset the above configuration with:
+
+Note that IP is typically 10.0.3.2. In Genymotion, 10.0.3.2 is a special alias that always points to your host's loopback interface. You need to confirm this by visiting http://10.0.3.2:1337 on with emulator and see it if gets intercepted on burpsuite. The port is the port configured on Burpsuite
 
 ```bash
 adb shell "iptables -t nat -F"
